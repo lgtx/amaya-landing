@@ -13,48 +13,45 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Diagnóstico: imprime PWD y lista de la raíz FTP
-      - name: Diagnose FTP path
+      # Diagnóstico: verifica conexión y ruta con TLS válido
+      - name: Diagnose FTP path (FTPS)
         run: |
           sudo apt-get update -y && sudo apt-get install -y lftp
           lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_HOST }}" -e "
             set ftp:passive-mode on
-            set net:max-retries 1
+            set ftp:ssl-allow yes           # FTPS
+            set ftp:ssl-force yes
+            set ssl:verify-certificate yes  # verifica el cert (debería pasar con bh8936.banahosting.com)
             pwd; ls -la;
             echo '---- try cd /amayaia.com/ ----';
             cd /amayaia.com/ || echo 'no /amayaia.com/ here';
             pwd; ls -la;
             bye"
 
-      - name: Deploy over FTP
+      - name: Deploy over FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}
+          server:   ${{ secrets.FTP_HOST }}      # bh8936.banahosting.com
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
+          protocol: ftps                         # FTPS explícito (TLS)
           port: 21
-          # Si tu repo es la landing completa en la raíz, deja "./"
           local-dir: ./
-          # Ruta donde quieres que queden los archivos en tu hosting
-          server-dir: /amayaia.com/
+          server-dir: /amayaia.com/              # si diera 553, prueba /public_html/ o /public_html/amayaia.com/
           log-level: verbose
           dangerous-clean-slate: false
           exclude: |
-            # Git y GitHub
             .git
             .git/**
             **/.git
             **/.git/**
             .github/**
             **/.github/**
-            # SO / editor
             **/.DS_Store
             .idea/**
             .vscode/**
             node_modules/**
             **/*.md
-            # cosas del server que no quieres tocar
             backups/**
             uploads/**
             tmp/**
