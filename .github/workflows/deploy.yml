@@ -8,9 +8,23 @@ on:
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      # Diagnóstico: imprime PWD y lista de la raíz FTP
+      - name: Diagnose FTP path
+        run: |
+          sudo apt-get update -y && sudo apt-get install -y lftp
+          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_HOST }}" -e "
+            set ftp:passive-mode on
+            set net:max-retries 1
+            pwd; ls -la;
+            echo '---- try cd /amayaia.com/ ----';
+            cd /amayaia.com/ || echo 'no /amayaia.com/ here';
+            pwd; ls -la;
+            bye"
 
       - name: Deploy over FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -20,16 +34,27 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
+          # Si tu repo es la landing completa en la raíz, deja "./"
           local-dir: ./
-          server-dir: /amayaia.com/     # ajusta a la ruta correcta en tu hosting
+          # Ruta donde quieres que queden los archivos en tu hosting
+          server-dir: /amayaia.com/
+          log-level: verbose
+          dangerous-clean-slate: false
           exclude: |
-            **/.git*
+            # Git y GitHub
+            .git
+            .git/**
+            **/.git
+            **/.git/**
+            .github/**
             **/.github/**
+            # SO / editor
             **/.DS_Store
-            **/node_modules/**
-            **/*.md
             .idea/**
             .vscode/**
+            node_modules/**
+            **/*.md
+            # cosas del server que no quieres tocar
             backups/**
             uploads/**
             tmp/**
