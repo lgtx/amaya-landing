@@ -8,45 +8,26 @@ on:
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Diagnóstico: verifica conexión y ruta con TLS válido
-      - name: Diagnose FTP path (FTPS)
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y lftp
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" "${{ secrets.FTP_HOST }}" -e "
-            set ftp:passive-mode on
-            set ftp:ssl-allow yes           # FTPS
-            set ftp:ssl-force yes
-            set ssl:verify-certificate yes  # verifica el cert (debería pasar con bh8936.banahosting.com)
-            pwd; ls -la;
-            echo '---- try cd /amayaia.com/ ----';
-            cd /amayaia.com/ || echo 'no /amayaia.com/ here';
-            pwd; ls -la;
-            bye"
-
       - name: Deploy over FTPS
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server:   ${{ secrets.FTP_HOST }}      # bh8936.banahosting.com
+          server:   bh8936.banahosting.com   # <- host EXACTO del certificado
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps                         # FTPS explícito (TLS)
+          protocol: ftps                     # FTPS explícito
           port: 21
-          local-dir: ./
-          server-dir: /amayaia.com/              # si diera 553, prueba /public_html/ o /public_html/amayaia.com/
+          local-dir: ./                     # raíz del repo
+          server-dir: /amayaia.com/         # <- docroot correcto en tu cuenta
           log-level: verbose
           dangerous-clean-slate: false
           exclude: |
             .git
             .git/**
-            **/.git
-            **/.git/**
             .github/**
-            **/.github/**
             **/.DS_Store
             .idea/**
             .vscode/**
