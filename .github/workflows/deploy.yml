@@ -34,3 +34,26 @@ jobs:
             **/*.ai
             **/*.psd
             **/*.sketch
+
+exclude: |
+  # Git y GitHub
+  .git/**
+  **/.git/**
+  .gitignore
+  **/.gitignore
+  .gitattributes
+  **/.gitattributes
+  .github/**
+  **/.github/**
+
+  # Archivos locales, SO, editores
+  **/.DS_Store
+  .idea/**
+  .vscode/**
+  node_modules/**
+  **/*.md
+
+  # Carpetas del servidor que quieres conservar siempre
+  backups/**
+  uploads/**
+  tmp/**
