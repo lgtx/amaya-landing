@@ -2,13 +2,12 @@ name: Deploy via FTP to amayaia.com
 
 on:
   push:
-    branches: [ main ]          # corre en cada push a main
-  workflow_dispatch:             # permite ejecutarlo manualmente
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   ftp-deploy:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,11 +18,12 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp               # o usa ${{ secrets.FTP_PROTOCOL }} si lo definiste
-          port: 21                    # o usa ${{ secrets.FTP_PORT }}
-          local-dir: ./               # raíz del repo
-          server-dir: ${{ secrets.FTP_REMOTE_DIR }}  # ajusta si tu raíz es distinta
-          #dangerous-clean-slate: true   # (OPCIONAL) solo la primera vez si quieres limpiar todo
+          protocol: ftp
+          port: 21
+          local-dir: ./
+          server-dir: /amayaia.com/        # ⟵ ¡esta es la tuya!
+          log-level: standard
+          dangerous-clean-slate: false      # no borra todo de golpe
           exclude: |
             **/.git*
             **/.github/**
@@ -35,6 +35,3 @@ jobs:
             backups/**
             uploads/**
             tmp/**
-            **/*.ai
-            **/*.psd
-            **/*.sketch
