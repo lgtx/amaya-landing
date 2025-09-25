@@ -1,37 +1,36 @@
-name: Deploy via FTP to amayaia.com
+- name: Deploy
+  uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+  with:
+    server: ${{ secrets.FTP_HOST }}
+    username: ${{ secrets.FTP_USERNAME }}
+    password: ${{ secrets.FTP_PASSWORD }}
+    protocol: ftp
+    port: 21
+    local-dir: ./
+    server-dir: /amayaia.com/         # o /public_html/ si ese es tu docroot
+    log-level: verbose
+    dangerous-clean-slate: false
+    exclude: |
+      # Git
+      .git/**
+      **/.git/**
+      .git*
+      **/.git*
+      .github/**
+      **/.github/**
+      .gitattributes
+      .gitignore
 
-on:
-  push:
-    branches: [ main ]
-  workflow_dispatch:
+      # SO/editores
+      **/.DS_Store
+      .idea/**
+      .vscode/**
 
-jobs:
-  ftp-deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      # Node y docs
+      node_modules/**
+      **/*.md
 
-      - name: Deploy
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_HOST }}          # usa el hostname real del servidor
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          port: 21
-          local-dir: ./
-          server-dir: /amayaia.com/               # si tu contenido está ahí (o /public_html/)
-          log-level: verbose
-          dangerous-clean-slate: false
-          exclude: |
-            **/.git*
-            **/.github/**
-            **/.DS_Store
-            **/node_modules/**
-            **/*.md
-            .idea/**
-            .vscode/**
-            backups/**
-            uploads/**
-            tmp/**
+      # Carpetas del server que no quieres tocar
+      backups/**
+      uploads/**
+      tmp/**
