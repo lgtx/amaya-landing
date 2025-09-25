@@ -1,0 +1,36 @@
+name: Deploy via FTP to amayaia.com
+
+on:
+  push:
+    branches: [ main ]         # ejecuta en cada push a main
+  workflow_dispatch:            # permite ejecutarlo manualmente
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy over FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ secrets.FTP_PROTOCOL }}   # ftp
+          port: ${{ secrets.FTP_PORT }}           # 21
+          local-dir: ./                           # raíz del repo
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }}  # /amayaia.com/
+          exclude: |                              # NO subir
+            **/.git*
+            **/.github/**
+            **/.DS_Store
+            **/node_modules/**
+            **/*.md
+            .idea/**
+            .vscode/**
+            **/*.ai
+            **/*.psd
+            **/*.sketch
