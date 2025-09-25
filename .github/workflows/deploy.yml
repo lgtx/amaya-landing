@@ -12,28 +12,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # Paso temporal de diagnóstico (borra después de confirmar la ruta)
-      - name: Diagnose FTP path (temporary)
-        run: |
-          sudo apt-get update -y && sudo apt-get install -y lftp
-          lftp -u "${{ secrets.FTP_USERNAME }},${{ secrets.FTP_PASSWORD }}" ${{ secrets.FTP_HOST }} -e "
-            set ftp:passive-mode on
-            pwd; ls -la;
-            echo '---- try cd amayaia.com ----';
-            cd amayaia.com || echo 'no amayaia.com here';
-            pwd; ls -la;
-            bye"
-
       - name: Deploy
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ secrets.FTP_HOST }}
+          server: ${{ secrets.FTP_HOST }}          # usa el hostname real del servidor
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
           port: 21
           local-dir: ./
-          server-dir: /            # ← prueba aquí; si falla, prueba amayaia.com/ o /amayaia.com/
+          server-dir: /amayaia.com/               # si tu contenido está ahí (o /public_html/)
           log-level: verbose
           dangerous-clean-slate: false
           exclude: |
