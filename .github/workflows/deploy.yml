@@ -22,7 +22,7 @@ jobs:
           protocol: ftp               # o usa ${{ secrets.FTP_PROTOCOL }} si lo definiste
           port: 21                    # o usa ${{ secrets.FTP_PORT }}
           local-dir: ./               # raíz del repo
-          server-dir: /amayaia.com/   # ajusta si tu raíz es distinta
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }}  # ajusta si tu raíz es distinta
           #dangerous-clean-slate: true   # (OPCIONAL) solo la primera vez si quieres limpiar todo
           exclude: |
             **/.git*
