@@ -107,50 +107,55 @@ window.addEventListener('resize', setHeaderHeightVar);
 
 /* Slider fade + flechas (sin dots) */
 (function(){
-  const wrap   = document.querySelector('[data-phone-fader]');
-  if(!wrap) return;
-  const slides = Array.from(wrap.querySelectorAll('.phone-slide'));
-  const prev   = document.querySelector('[data-phone-prev]');
-  const next   = document.querySelector('[data-phone-next]');
+  const faders = Array.from(document.querySelectorAll('[data-phone-fader]'));
+  if (!faders.length) return;
 
-  let i = 0, busy = false, timer = null;
-  const D = 380;      // duración del fade
-  const T = 4200;     // autoplay
+  const D = 380;   // duración del fade (ms)
+  const T = 4200;  // autoplay (ms)
 
-  function go(dir){ // dir: +1 next, -1 prev
-    if(busy || slides.length < 2) return;
-    busy = true;
+  faders.forEach((wrap) => {
+    const root  = wrap.closest('.relative') || wrap.parentElement || document;
+    const slides = Array.from(wrap.querySelectorAll('.phone-slide'));
+    const prev   = root.querySelector('[data-phone-prev]');
+    const next   = root.querySelector('[data-phone-next]');
 
-    const cur = slides[i];
-    const n   = (i + (dir>0?1:-1) + slides.length) % slides.length;
-    const nxt = slides[n];
+    if (slides.length < 2) return;
 
-    // preparar capas para crossfade
-    nxt.classList.add('is-active');      // aparecer
-    cur.classList.add('is-leaving');     // se mantiene arriba mientras hace fade-out
+    let i = 0, busy = false, timer = null;
 
-    // iniciar fade-out de la actual
-    cur.classList.remove('is-active');
+    function go(dir){ // dir: +1 next, -1 prev
+      if (busy) return;
+      busy = true;
 
-    // al finalizar el fade, limpiar y actualizar índice
-    setTimeout(() => {
-      cur.classList.remove('is-leaving');
-      i = n; busy = false;
-    }, D);
-  }
+      const cur = slides[i];
+      const n   = (i + (dir>0?1:-1) + slides.length) % slides.length;
+      const nxt = slides[n];
 
-  function play(){ stop(); timer = setInterval(()=>go(+1), T); }
-  function stop(){ if(timer){ clearInterval(timer); timer = null; } }
+      // preparar capas para crossfade
+      nxt.classList.add('is-active');   // entra
+      cur.classList.add('is-leaving');  // mantiene z-index arriba mientras hace fade-out
+      cur.classList.remove('is-active');
 
-  next?.addEventListener('click', ()=>{ stop(); go(+1); play(); });
-  prev?.addEventListener('click', ()=>{ stop(); go(-1); play(); });
+      setTimeout(() => {
+        cur.classList.remove('is-leaving');
+        i = n;
+        busy = false;
+      }, D);
+    }
 
-  // Pausa en hover (desktop)
-  wrap.addEventListener('mouseenter', stop);
-  wrap.addEventListener('mouseleave', play);
+    function play(){ stop(); timer = setInterval(()=>go(+1), T); }
+    function stop(){ if (timer) { clearInterval(timer); timer = null; } }
 
-  // Init
-  slides.forEach((s,idx)=> s.classList.toggle('is-active', idx===0));
-  play();
+    next?.addEventListener('click', ()=>{ stop(); go(+1); play(); });
+    prev?.addEventListener('click', ()=>{ stop(); go(-1); play(); });
+
+    // Pausa en hover (desktop)
+    wrap.addEventListener('mouseenter', stop);
+    wrap.addEventListener('mouseleave', play);
+
+    // Init
+    slides.forEach((s,idx)=> s.classList.toggle('is-active', idx===0));
+    play();
+  });
 })();
 
