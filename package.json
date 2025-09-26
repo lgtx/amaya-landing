@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --watch",
-    "build": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --min"
+    "dev": "tailwindcss -i ./assets/css/input.css -o ./assets/css/landing.css --watch",
+    "build": "tailwindcss -i ./assets/css/input.css -o ./assets/css/landing.css -m"
   }
 }
