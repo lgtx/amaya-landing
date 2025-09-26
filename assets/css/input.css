@@ -65,6 +65,8 @@ html { scroll-behavior: smooth; }
   box-shadow:0 4px 12px rgba(0,0,0,.18);
   backdrop-filter:blur(4px);
   opacity:.9; transition:transform .2s ease, background .2s ease, opacity .2s ease;
+  z-index: 20;                 /* ← asegura que queden por encima */
+  pointer-events: auto;       /* ← por si acaso */
 }
 .phone-arrow:hover{ background:rgba(255,255,255,.18); transform:translateY(-50%) scale(1.04); }
 .phone-arrow:active{ transform:translateY(-50%) scale(.98); }
