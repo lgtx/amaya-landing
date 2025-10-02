@@ -1,0 +1,10 @@
+# Dependencias
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Builds temporales
+.DS_Store
+
+# (NO ignores el compilado que subes al hosting)
+# assets/css/landing.css  ← NO poner aquí
